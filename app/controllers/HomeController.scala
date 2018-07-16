@@ -28,12 +28,16 @@ class HomeController @Inject()(cc: ControllerComponents, indexTemplate: views.ht
    * will be called when the application receives a `GET` request with
    * a path of `/`.
    */
-  def index() = Action.async { implicit request: Request[AnyContent] =>
+/*  def index() = Action.async { implicit request: Request[AnyContent] =>
     logger.info("home controller index action.")
     cr.createRemoteMysql() map { db =>
       Ok(Json.obj("database" -> db))
     }
-  }
+  }*/
+
+  def index() = Action { implicit request =>
+    Ok(indexTemplate())
+ }
 
   val JSON_KEY_COMMENTS = "comments"
   val JSON_KEY_AUTHOR = "author"

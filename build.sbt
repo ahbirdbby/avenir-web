@@ -16,6 +16,8 @@ libraryDependencies += jdbc
 libraryDependencies ++= Seq(
   "org.webjars" %% "webjars-play" % "2.6.3",
   "org.webjars" % "bootstrap" % "3.1.1-2",
+  "org.webjars.npm" % "react" % "16.4.0",
+  "org.webjars.npm" % "react-dom" % "16.4.0",
   "org.webjars" % "marked" % "0.3.2",
   "org.webjars" % "jquery" % "2.1.4"
 )
@@ -44,6 +46,12 @@ libraryDependencies ++= Seq(
 
 
 libraryDependencies += "org.scalatestplus.play" %% "scalatestplus-play" % "3.1.2" % Test
+libraryDependencies += "org.pentaho" % "pentaho-aggdesigner-algorithm" % "5.1.5-jhyde" % Test
+
+dependencyOverrides += "org.webjars.npm" % "js-tokens" % "3.0.2"
+
+resolvers += Resolver.mavenLocal
+resolvers += "Cascading repo" at "http://conjars.org/repo"
 
 fork in Test := false
 

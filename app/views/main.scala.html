@@ -22,7 +22,13 @@
     <body>
         @* And here's where we render the `Html` object containing
          * the page content. *@
-        @content
+        <div class="head">
+            <img class="head_logo" src="@routes.Assets.versioned("images/tic-logo200x200.png")">
+        </div>
+        <div class="nav"></div>
+        <div class="content">
+            @content
+        </div>
 
       <script src="@routes.Assets.versioned("javascripts/main.js")" type="text/javascript"></script>
     </body>
