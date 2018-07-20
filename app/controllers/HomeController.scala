@@ -16,7 +16,7 @@ import scala.concurrent.{ExecutionContext, Future}
  * application's home page.
  */
 @Singleton
-class HomeController @Inject()(cc: ControllerComponents, indexTemplate: views.html.home.index, cr: ComputerRepository)(implicit ec: ExecutionContext) extends AbstractController(cc) {
+class HomeController @Inject()(cc: ControllerComponents,  cr: ComputerRepository)(implicit ec: ExecutionContext) extends AbstractController(cc) {
 
   private val logger = Logger(this.getClass)
 
@@ -34,10 +34,6 @@ class HomeController @Inject()(cc: ControllerComponents, indexTemplate: views.ht
       Ok(Json.obj("database" -> db))
     }
   }*/
-
-  def index() = Action { implicit request =>
-    Ok(indexTemplate())
- }
 
   val JSON_KEY_COMMENTS = "comments"
   val JSON_KEY_AUTHOR = "author"
@@ -64,5 +60,9 @@ class HomeController @Inject()(cc: ControllerComponents, indexTemplate: views.ht
     cr.showDatabases() map { db =>
       Ok(Json.obj("database" -> db))
     }
+  }
+
+  def appSummary = Action {
+    Ok(Json.obj("content" -> "Scala Play React Seed - Avenir"))
   }
 }

@@ -4,23 +4,28 @@ organization := "com.quest"
 version := "1.0-SNAPSHOT"
 
 lazy val root = (project in file("."))
-  .enablePlugins(PlayScala, SbtWeb)
+  .enablePlugins(PlayScala)
   .settings(
+    watchSources ++= (baseDirectory.value / "public/ui" ** "*").get
   )
+
+// ReactJsKeys.harmony := true
+// ReactJsKeys.es6module := true
 
 scalaVersion := "2.12.6"
 
 libraryDependencies += guice
 libraryDependencies += jdbc
 
-libraryDependencies ++= Seq(
-  "org.webjars" %% "webjars-play" % "2.6.3",
-  "org.webjars" % "bootstrap" % "3.1.1-2",
-  "org.webjars.npm" % "react" % "16.4.0",
-  "org.webjars.npm" % "react-dom" % "16.4.0",
-  "org.webjars" % "marked" % "0.3.2",
-  "org.webjars" % "jquery" % "2.1.4"
-)
+// libraryDependencies ++= Seq(
+//   "org.webjars" %% "webjars-play" % "2.6.3",
+//   "org.webjars" % "bootstrap" % "3.1.1-2",
+//   "org.webjars.npm" % "react" % "16.4.0",
+//   "org.webjars.npm" % "react-dom" % "16.4.0",
+//   "org.webjars" % "marked" % "0.3.2",
+//   "org.webjars" % "jquery" % "2.1.4"
+// //  "org.webjars" % "requirejs" % "2.1.5" % "runtime"
+// )
 
 libraryDependencies += "net.codingwell" %% "scala-guice" % "4.2.1"
 libraryDependencies += "org.playframework.anorm" %% "anorm" % "2.6.1"
@@ -48,7 +53,7 @@ libraryDependencies ++= Seq(
 libraryDependencies += "org.scalatestplus.play" %% "scalatestplus-play" % "3.1.2" % Test
 libraryDependencies += "org.pentaho" % "pentaho-aggdesigner-algorithm" % "5.1.5-jhyde" % Test
 
-dependencyOverrides += "org.webjars.npm" % "js-tokens" % "3.0.2"
+// dependencyOverrides += "org.webjars.npm" % "js-tokens" % "3.0.2"
 
 resolvers += Resolver.mavenLocal
 resolvers += "Cascading repo" at "http://conjars.org/repo"
