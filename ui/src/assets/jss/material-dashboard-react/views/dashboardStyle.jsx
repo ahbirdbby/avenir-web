@@ -1,6 +1,6 @@
 import { successColor } from "assets/jss/material-dashboard-react.jsx";
 
-const dashboardStyle = {
+const dashboardStyle = theme => ({
   successText: {
     color: successColor
   },
@@ -65,7 +65,13 @@ const dashboardStyle = {
       fontWeight: "400",
       lineHeight: "1"
     }
+  },
+  button: {
+    margin: theme.spacing.unit
+  },
+  extendedIcon: {
+    marginRight: theme.spacing.unit
   }
-};
+});
 
 export default dashboardStyle;

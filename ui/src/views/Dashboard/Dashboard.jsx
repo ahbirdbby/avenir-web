@@ -16,7 +16,7 @@ import Update from "@material-ui/icons/Update";
 import ArrowUpward from "@material-ui/icons/ArrowUpward";
 import AccessTime from "@material-ui/icons/AccessTime";
 import Accessibility from "@material-ui/icons/Accessibility";
-import BugReport from "@material-ui/icons/BugReport";
+import ConnectIcon from "@material-ui/icons/SettingsInputComponent";
 import Code from "@material-ui/icons/Code";
 import Cloud from "@material-ui/icons/Cloud";
 // core components
@@ -31,7 +31,33 @@ import CardIcon from "components/Card/CardIcon.jsx";
 import CardBody from "components/Card/CardBody.jsx";
 import CardFooter from "components/Card/CardFooter.jsx";
 
+import Button from '@material-ui/core/Button';
+import AddIcon from '@material-ui/icons/Add';
+import Icon from '@material-ui/core/Icon';
+import DeleteIcon from '@material-ui/icons/Delete';
+import NavigationIcon from '@material-ui/icons/Navigation';
+
+import List from '@material-ui/core/List';
+import ListItem from '@material-ui/core/ListItem';
+import ListItemIcon from '@material-ui/core/ListItemIcon';
+import ListItemText from '@material-ui/core/ListItemText';
+import Collapse from '@material-ui/core/Collapse';
+import InboxIcon from '@material-ui/icons/MoveToInbox';
+import DraftsIcon from '@material-ui/icons/Drafts';
+import SendIcon from '@material-ui/icons/Send';
+import ExpandLess from '@material-ui/icons/ExpandLess';
+import ExpandMore from '@material-ui/icons/ExpandMore';
+import StarBorder from '@material-ui/icons/StarBorder';
+import PowerIcon from '@material-ui/icons/Power';
+
+
 import { bugs, website, server } from "variables/general";
+
+import ConnectionDialog from "views/Dashboard/ConnectionDialog.jsx";
+import ConnectionTree from "views/Dashboard/ConnectionTree.jsx";
+import DatabaseTree from "views/Dashboard/DatabaseTree.jsx";
+import {Treebeard, decorators} from 'react-treebeard';
+import TreebeardStyle from "assets/jss/material-dashboard-react/components/treebeardStyle.jsx";
 
 import {
   dailySalesChart,
@@ -41,240 +67,226 @@ import {
 
 import dashboardStyle from "assets/jss/material-dashboard-react/views/dashboardStyle.jsx";
 
+import SvgIcon from '@material-ui/core/SvgIcon';
+
+function DatabaseIcon(props) {
+  return (
+    <SvgIcon {...props}>
+      <path d="M12,3C7.58,3 4,4.79 4,7C4,9.21 7.58,11 12,11C16.42,11 20,9.21 20,7C20,4.79 16.42,3 12,3M4,9V12C4,14.21 7.58,16 12,16C16.42,16 20,14.21 20,12V9C20,11.21 16.42,13 12,13C7.58,13 4,11.21 4,9M4,14V17C4,19.21 7.58,21 12,21C16.42,21 20,19.21 20,17V14C20,16.21 16.42,18 12,18C7.58,18 4,16.21 4,14Z" />
+    </SvgIcon>
+  );
+}
+
+function ArrowRight(props) {
+  return (
+    <SvgIcon {...props}>
+      <path  d="M10,17L15,12L10,7V17Z" />
+    </SvgIcon>
+  );
+}
+
+const data = {
+  name: 'root',
+  toggled: true,
+  children: [
+      {
+          name: 'parent',
+          children: [
+              { name: 'child1' },
+              { name: 'child2' }
+          ]
+      },
+      {
+          name: 'loading parent',
+          loading: true,
+          children: []
+      },
+      {
+          name: 'parent',
+          children: [
+              {
+                  name: 'nested parent',
+                  children: [
+                      { name: 'nested child 1' },
+                      { name: 'nested child 2' }
+                  ]
+              }
+          ]
+      }
+  ]
+};
+
+const dec = {
+  ...decorators,
+  Toggle: (props) => {
+    return (
+      <div style={props.style.base}>
+        <ArrowRight />
+      </div>
+    );
+  },
+  Header: ({style, node}) => {
+    return (
+      <div style={style.base}>
+      <DatabaseIcon />
+        <div>        
+            <span>{node.name}</span>
+        </div>
+        </div>
+    );
+}
+};
+
 class Dashboard extends React.Component {
   state = {
-    value: 0
+    value: 0,
+    open: false,
+    connections: [],
+    localDatabases: []
   };
-  handleChange = (event, value) => {
-    this.setState({ value });
+
+  closeConnectionDialog = (connection) => {
+    let connections = this.state.connections;
+    if (connection && connection.id == null) {
+      connection.id = connections.length;
+      connections.push(connection);
+    } else {
+
+    }
+
+    this.setState(prev => ({...prev, open: false, connections: connections}));
   };
+
+  openConnectionDialog = (conn) => {
+    if (conn != null) {
+      this.setState({selectedCon: conn});
+    }
+
+    this.setState({open: true});
+  }
 
   handleChangeIndex = index => {
     this.setState({ value: index });
   };
+
+  onToggle = (node, toggled) => {
+    if(this.state.cursor){this.state.cursor.active = false;}
+    node.active = true;
+    if(node.children){ node.toggled = toggled; }
+    this.setState({ cursor: node });
+  }
+
   render() {
     const { classes } = this.props;
     return (
       <div>
-        <Grid container>
-          <GridItem xs={12} sm={6} md={3}>
-            <Card>
-              <CardHeader color="warning" stats icon>
-                <CardIcon color="warning">
-                  <ContentCopy />
-                </CardIcon>
-                <p className={classes.cardCategory}>Used Space</p>
-                <h3 className={classes.cardTitle}>
-                  49/50 <small>GB</small>
-                </h3>
-              </CardHeader>
-              <CardFooter stats>
-                <div className={classes.stats}>
-                  <Danger>
-                    <Warning />
-                  </Danger>
-                  <a href="#pablo" onClick={e => e.preventDefault()}>
-                    Get more space
-                  </a>
-                </div>
-              </CardFooter>
-            </Card>
-          </GridItem>
-          <GridItem xs={12} sm={6} md={3}>
-            <Card>
-              <CardHeader color="success" stats icon>
-                <CardIcon color="success">
-                  <Store />
-                </CardIcon>
-                <p className={classes.cardCategory}>Revenue</p>
-                <h3 className={classes.cardTitle}>$34,245</h3>
-              </CardHeader>
-              <CardFooter stats>
-                <div className={classes.stats}>
-                  <DateRange />
-                  Last 24 Hours
-                </div>
-              </CardFooter>
-            </Card>
-          </GridItem>
-          <GridItem xs={12} sm={6} md={3}>
-            <Card>
-              <CardHeader color="danger" stats icon>
-                <CardIcon color="danger">
-                  <InfoOutline />
-                </CardIcon>
-                <p className={classes.cardCategory}>Fixed Issues</p>
-                <h3 className={classes.cardTitle}>75</h3>
-              </CardHeader>
-              <CardFooter stats>
-                <div className={classes.stats}>
-                  <LocalOffer />
-                  Tracked from Github
-                </div>
-              </CardFooter>
-            </Card>
-          </GridItem>
-          <GridItem xs={12} sm={6} md={3}>
-            <Card>
-              <CardHeader color="info" stats icon>
-                <CardIcon color="info">
-                  <Accessibility />
-                </CardIcon>
-                <p className={classes.cardCategory}>Followers</p>
-                <h3 className={classes.cardTitle}>+245</h3>
-              </CardHeader>
-              <CardFooter stats>
-                <div className={classes.stats}>
-                  <Update />
-                  Just Updated
-                </div>
-              </CardFooter>
-            </Card>
-          </GridItem>
-        </Grid>
-        <Grid container>
-          <GridItem xs={12} sm={12} md={4}>
-            <Card chart>
-              <CardHeader color="success">
-                <ChartistGraph
-                  className="ct-chart"
-                  data={dailySalesChart.data}
-                  type="Line"
-                  options={dailySalesChart.options}
-                  listener={dailySalesChart.animation}
-                />
-              </CardHeader>
-              <CardBody>
-                <h4 className={classes.cardTitle}>Daily Sales</h4>
-                <p className={classes.cardCategory}>
-                  <span className={classes.successText}>
-                    <ArrowUpward className={classes.upArrowCardCategory} /> 55%
-                  </span>{" "}
-                  increase in today sales.
-                </p>
-              </CardBody>
-              <CardFooter chart>
-                <div className={classes.stats}>
-                  <AccessTime /> updated 4 minutes ago
-                </div>
-              </CardFooter>
-            </Card>
-          </GridItem>
-          <GridItem xs={12} sm={12} md={4}>
-            <Card chart>
-              <CardHeader color="warning">
-                <ChartistGraph
-                  className="ct-chart"
-                  data={emailsSubscriptionChart.data}
-                  type="Bar"
-                  options={emailsSubscriptionChart.options}
-                  responsiveOptions={emailsSubscriptionChart.responsiveOptions}
-                  listener={emailsSubscriptionChart.animation}
-                />
-              </CardHeader>
-              <CardBody>
-                <h4 className={classes.cardTitle}>Email Subscriptions</h4>
-                <p className={classes.cardCategory}>
-                  Last Campaign Performance
-                </p>
-              </CardBody>
-              <CardFooter chart>
-                <div className={classes.stats}>
-                  <AccessTime /> campaign sent 2 days ago
-                </div>
-              </CardFooter>
-            </Card>
-          </GridItem>
-          <GridItem xs={12} sm={12} md={4}>
-            <Card chart>
-              <CardHeader color="danger">
-                <ChartistGraph
-                  className="ct-chart"
-                  data={completedTasksChart.data}
-                  type="Line"
-                  options={completedTasksChart.options}
-                  listener={completedTasksChart.animation}
-                />
-              </CardHeader>
-              <CardBody>
-                <h4 className={classes.cardTitle}>Completed Tasks</h4>
-                <p className={classes.cardCategory}>
-                  Last Campaign Performance
-                </p>
-              </CardBody>
-              <CardFooter chart>
-                <div className={classes.stats}>
-                  <AccessTime /> campaign sent 2 days ago
-                </div>
-              </CardFooter>
-            </Card>
-          </GridItem>
-        </Grid>
+            <div>
+      <Button variant="fab" color="primary" aria-label="Add" className={classes.button} onClick={this.openConnectionDialog}>
+        <AddIcon />
+      </Button>
+      <Button variant="fab" color="secondary" aria-label="Edit" className={classes.button}>
+        <Icon>edit_icon</Icon>
+      </Button>
+      <Button variant="extendedFab" aria-label="Delete" className={classes.button}>
+        <NavigationIcon className={classes.extendedIcon} />
+        Extended
+      </Button>
+      <Button variant="fab" disabled aria-label="Delete" className={classes.button}>
+        <DeleteIcon />
+      </Button>
+
+      <ConnectionDialog
+            open={this.state.open}
+            onClose={this.closeConnectionDialog}
+            value={this.state.selectedCon}
+          />
+    </div>
         <Grid container>
           <GridItem xs={12} sm={12} md={6}>
             <CustomTabs
-              title="Tasks:"
+              title=""
               headerColor="primary"
               tabs={[
                 {
-                  tabName: "Bugs",
-                  tabIcon: BugReport,
+                  tabName: "Connections",
+                  tabIcon: ConnectIcon,
                   tabContent: (
-                    <Tasks
-                      checkedIndexes={[0, 3]}
-                      tasksIndexes={[0, 1, 2, 3]}
-                      tasks={bugs}
-                    />
-                  )
-                },
-                {
-                  tabName: "Website",
-                  tabIcon: Code,
-                  tabContent: (
-                    <Tasks
-                      checkedIndexes={[0]}
-                      tasksIndexes={[0, 1]}
-                      tasks={website}
-                    />
-                  )
-                },
-                {
-                  tabName: "Server",
-                  tabIcon: Cloud,
-                  tabContent: (
-                    <Tasks
-                      checkedIndexes={[1]}
-                      tasksIndexes={[0, 1, 2]}
-                      tasks={server}
-                    />
+                    <ConnectionTree connections={this.state.connections} openConnectionDialog={this.openConnectionDialog}/>
                   )
                 }
               ]}
             />
           </GridItem>
           <GridItem xs={12} sm={12} md={6}>
-            <Card>
-              <CardHeader color="warning">
-                <h4 className={classes.cardTitleWhite}>Employees Stats</h4>
-                <p className={classes.cardCategoryWhite}>
-                  New employees on 15th September, 2016
-                </p>
-              </CardHeader>
-              <CardBody>
-                <Table
-                  tableHeaderColor="warning"
-                  tableHead={["ID", "Name", "Salary", "Country"]}
-                  tableData={[
-                    ["1", "Dakota Rice", "$36,738", "Niger"],
-                    ["2", "Minerva Hooper", "$23,789", "Curaçao"],
-                    ["3", "Sage Rodriguez", "$56,142", "Netherlands"],
-                    ["4", "Philip Chaney", "$38,735", "Korea, South"]
-                  ]}
-                />
-              </CardBody>
-            </Card>
+          <CustomTabs
+              title=""
+              headerColor="info"
+              tabs={[
+                {
+                  tabName: "Object Explorer",
+                  tabIcon: ConnectIcon,
+                  tabContent: (
+                    <List dense disablePadding
+                    >
+                      <ListItem button>
+                        <ListItemIcon>
+                          <DatabaseIcon />
+                        </ListItemIcon>
+                        <ListItemText inset primary="Database" />
+                      </ListItem>
+                      <ListItem button>
+                        <ListItemIcon>
+                          <DraftsIcon />
+                        </ListItemIcon>
+                        <ListItemText inset primary="Drafts" />
+                      </ListItem>
+                      <ListItem button onClick={this.handleClick}>
+                      {this.state.open ? <ExpandLess /> : <ExpandMore />}
+                        <ListItemIcon>
+                          <InboxIcon />
+                        </ListItemIcon>
+                        <ListItemText inset primary="Inbox" />
+                      </ListItem>
+                      <Collapse in={this.state.open} timeout="auto" unmountOnExit>
+                        <List component="div" disablePadding>
+                          <ListItem button className={classes.nested}>
+                            <ListItemIcon>
+                              <StarBorder />
+                            </ListItemIcon>
+                            <ListItemText inset primary="Starred" />
+                          </ListItem>
+                        </List>
+                      </Collapse>
+                    </List>
+                  )
+                }
+              ]}
+            />
           </GridItem>
         </Grid>
+        <Grid container>
+          <GridItem xs={12} sm={12} md={6}>
+          <CustomTabs
+              title="Local"
+              headerColor="info"
+              tabs={[
+                {
+                  tabName: "Object Explorer",
+                  tabIcon: ConnectIcon,
+                  tabContent: (
+                    <Treebeard
+                data={data}
+                onToggle={this.onToggle}
+                decorators={dec}
+                style={TreebeardStyle}
+            />
+                  )
+                }
+              ]}
+            />
+          </GridItem>
+          <GridItem xs={12} sm={12} md={6}></GridItem>
+          </Grid>
       </div>
     );
   }

@@ -1,11 +1,14 @@
 /* eslint-disable no-undef */
 function getSummary(cb) {
-  return fetch('/api/summary', {
+    return baseGet('/api/summary').then(cb);
+}
+
+function baseGet(url) {
+  return fetch(url, {
     accept: "application/json"
   })
     .then(checkStatus)
     .then(parseJSON)
-    .then(cb);
 }
 
 function checkStatus(response) {

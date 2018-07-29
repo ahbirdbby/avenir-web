@@ -29,7 +29,8 @@ const headerStyle = theme => ({
   },
   container: {
     ...container,
-    minHeight: "50px"
+    minHeight: "50px",
+    alignItems: "initial"
   },
   flex: {
     flex: 1
