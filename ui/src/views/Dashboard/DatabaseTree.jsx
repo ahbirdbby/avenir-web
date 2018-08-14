@@ -43,6 +43,12 @@ class DatabaseTree extends React.Component {
 
     constructor(props) {
       super(props);
+
+      this.state = {dbState:[]}
+    }
+
+    handleClick = (expand) => {
+
     }
   
     render() {

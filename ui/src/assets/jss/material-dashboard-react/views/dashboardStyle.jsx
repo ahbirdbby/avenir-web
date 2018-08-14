@@ -66,6 +66,10 @@ const dashboardStyle = theme => ({
       lineHeight: "1"
     }
   },
+  cardBody: {
+    maxHeight: '400px',
+    overflowY: 'scroll'
+  },
   button: {
     margin: theme.spacing.unit
   },

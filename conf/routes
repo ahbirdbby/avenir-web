@@ -8,6 +8,13 @@ GET     /                           controllers.FrontendController.index()
 
 # An example route (Prefix all API routes with apiPrefix defined in application.conf)
 GET     /api/summary                controllers.HomeController.appSummary
+GET     /api/databases              controllers.HomeController.getDatabases
+
+POST     /api/runQuery              controllers.HomeController.runQuery
+POST     /api/mapDatabase              controllers.HomeController.mapDatabase
+DELETE     /api/databases/:databaseName              controllers.HomeController.unmapDatabase(databaseName: String)
+POST     /api/mapTable              controllers.HomeController.mapTable
+DELETE     /api/databases/:databaseName/tables/:tableName             controllers.HomeController.unmapTable(databaseName: String, tableName: String)
 
 # Serve static assets under public directory
 GET     /*file                      controllers.FrontendController.assetOrDefault(file)

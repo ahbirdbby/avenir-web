@@ -18,10 +18,14 @@ import Typography from '@material-ui/core/Typography';
 import style from "assets/jss/material-dashboard-react/views/connectionDialogStyle.jsx";
 
 const databases = [
-    { value: 'GENERIC', label: 'Generic' },
-    { value: 'MYSQL', label: 'MySQL' },
-    { value: 'ORACLE', label: 'Oracle' },
-    { value: 'SQL_SERVER', label: 'SQL Server' }
+    { value: 'PostgreSQL', label: 'PostgreSQL' },
+    { value: 'MySQL', label: 'MySQL' },
+    { value: 'Oracle', label: 'Oracle' },
+    { value: 'SQLServer', label: 'SQL Server' },
+    { value: 'DB2', label: 'DB2' },
+    { value: 'SQLAzure', label: 'SQLAzure' },
+    { value: 'FileMaker', label: 'FileMaker' },
+    { value: 'MariaDB', label: 'MariaDB' }
   ];
 
 class ConnectionDialog extends React.Component {
@@ -69,7 +73,7 @@ class ConnectionDialog extends React.Component {
 
     handleEnter = () => {
         if (this.props.value.host === undefined) {
-            this.setState({database: {type: null, host: '', port: 0, user: '', password: '', schema: ''}});
+            this.setState({database: {type: null, host: '', port: 0, user: '', password: '', schema: '', toSchema: ''}});
         } else {
             this.setState({database: this.props.value});
         }
@@ -78,7 +82,7 @@ class ConnectionDialog extends React.Component {
     render() {
       const { classes, ...other } = this.props;
       const {database:db} = this.state;
-      let title = db.id === undefined ? "New Connection" : "Edit Connection";
+      let title = db.id === undefined ? "Map Database" : "Map Database";
   
       return (
         <Dialog
@@ -153,9 +157,18 @@ class ConnectionDialog extends React.Component {
                                       <TextField
                                           id="database"
                                           label="Database"
+                                          required
                                           className={classes.textField}
                                           value={this.state.database.schema}
                                           onChange={this.handleChange('schema')}
+                                          margin="dense"
+                                      />
+                                      <TextField
+                                          id="toDatabase"
+                                          label="Local Database"
+                                          className={classes.textField}
+                                          value={this.state.database.toSchema}
+                                          onChange={this.handleChange('toSchema')}
                                           margin="dense"
                                       />
                                   </div>
@@ -179,9 +192,11 @@ class ConnectionDialog extends React.Component {
             <Button onClick={this.handleCancel} color="primary">
               Cancel
             </Button>
+            {db.id === undefined ? 
             <Button onClick={this.handleOk} color="primary">
               Ok
-            </Button>
+            </Button> : null
+            }
           </DialogActions>
         </Dialog>
       );

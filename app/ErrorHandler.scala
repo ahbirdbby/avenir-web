@@ -1,3 +1,5 @@
+import java.sql.SQLClientInfoException
+import java.util.concurrent.ExecutionException
 import javax.inject.{Inject, Provider}
 
 import play.api._
@@ -69,8 +71,9 @@ class ErrorHandler(environment: Environment,
   override protected def onDevServerError(
                                            request: RequestHeader,
                                            exception: UsefulException): Future[Result] = {
-    Future.successful(
-      InternalServerError(Json.obj("exception" -> exception.toString)))
+    Future.successful {
+      InternalServerError(Json.obj("exception" -> exception.description))
+    }
   }
 
   override protected def onProdServerError(

@@ -19,6 +19,7 @@ export default {
                 display: 'flex'
             },
             activeLink: {
+                backgroundColor: 'lightgray'
             },
             toggle: {
                 base: {

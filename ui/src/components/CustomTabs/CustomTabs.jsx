@@ -14,6 +14,8 @@ import CardBody from "components/Card/CardBody.jsx";
 import CardHeader from "components/Card/CardHeader.jsx";
 
 import customTabsStyle from "assets/jss/material-dashboard-react/components/customTabsStyle.jsx";
+import CardActions from "@material-ui/core/CardActions";
+import Button from "@material-ui/core/Button";
 
 class CustomTabs extends React.Component {
   state = {
@@ -31,12 +33,16 @@ class CustomTabs extends React.Component {
       plainTabs,
       tabs,
       title,
-      rtlActive
+      rtlActive,
+      buttons
     } = this.props;
     const cardTitle = classNames({
       [classes.cardTitle]: true,
       [classes.cardTitleRTL]: rtlActive
     });
+    const cardBody = classNames({
+      [classes.cardBody]: true
+    })
     return (
       <Card plain={plainTabs}>
         <CardHeader color={headerColor} plain={plainTabs}>
@@ -77,7 +83,11 @@ class CustomTabs extends React.Component {
             })}
           </Tabs>
         </CardHeader>
-        <CardBody>
+
+        <CardActions className={classes.actions} disableActionSpacing>
+            {buttons}
+          </CardActions>
+        <CardBody className={cardBody}>
           {tabs.map((prop, key) => {
             if (key === this.state.value) {
               return <div key={key}>{prop.tabContent}</div>;
