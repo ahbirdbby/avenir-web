@@ -1,12 +1,14 @@
 const style = theme => ({
+    popup: {
+      backgroundColor: '#eeeeee'
+    },
     root: {
-        height: '450px',
-        width: '400px'
+        minHeight: '450px',
+        width: '450px'
     },
     group: {
-        width: '350px',
-        padding: '10px 10px',
-        border: 'solid 1px #ebebeb',
+        width: '400px',
+        padding: '10px 10px'
     },
     loginForm: {
         display: 'flex',
@@ -14,14 +16,14 @@ const style = theme => ({
       },
     textField: {
         marginRight: theme.spacing.unit,
-        width: 340,
+        width: 400,
       },
       portTextField: {
           width: 108,
           marginLeft: theme.spacing.unit * 4
       },
       hostTextField: {
-        width: 200
+        width: 250
     },
     divider: {
         margin: '10px 0px'

@@ -5,7 +5,7 @@ import javax.inject._
 import models._
 import play.api._
 import play.api.db.DBApi
-import play.api.libs.json.{JsArray, JsError, Json, Writes}
+import play.api.libs.json._
 import play.api.mvc._
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -31,6 +31,12 @@ class HomeController @Inject()(cc: ControllerComponents,  cr: ComputerRepository
   implicit val mapTableParamReads = Json.reads[MapTableParam]
 
   implicit val runQueryParamReads = Json.reads[RunQueryParam]
+
+  implicit val columnWrites = new Writes[Seq[Column]] {
+    override def writes(o: Seq[Column]): JsValue = {
+      o.foldLeft(Json.arr())((arr, item) => arr :+ (Json.obj("name" -> item.name, "dataType" -> item.dataType)))
+    }
+  }
 
   /**
    * Create an Action to render an HTML page.
@@ -117,7 +123,7 @@ class HomeController @Inject()(cc: ControllerComponents,  cr: ComputerRepository
 
     param.fold[Future[Result]](
       errors => {
-        Future {BadRequest(Json.obj("message" -> JsError.toJson(errors)))}
+        Future {BadRequest(Json.obj("error" -> JsError.toJson(errors)))}
       },
       p => {
         baseRep.mapDatabase(p) map { result =>
@@ -151,6 +157,12 @@ class HomeController @Inject()(cc: ControllerComponents,  cr: ComputerRepository
   def unmapTable(databaseName: String, tableName: String) = Action.async { req =>
     baseRep.unmapTable(databaseName, tableName) map { result =>
       if (result) Ok(Json.obj("status" -> "Success")) else Ok(Json.obj(("status" -> "Failure")))
+    }
+  }
+
+  def getColumns(databaseName: String, tableName: String, remote: Boolean) = Action.async { req =>
+    baseRep.getColumns(databaseName, tableName, remote) map { result =>
+      Ok(Json.toJson(result))
     }
   }
 }

@@ -14,6 +14,8 @@ import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import Divider from '@material-ui/core/Divider';
 import Typography from '@material-ui/core/Typography';
+// core components
+import SnackbarContent from "components/Snackbar/SnackbarContent.jsx";
 
 import style from "assets/jss/material-dashboard-react/views/connectionDialogStyle.jsx";
 
@@ -28,6 +30,14 @@ const databases = [
     { value: 'MariaDB', label: 'MariaDB' }
   ];
 
+const errorObj = {
+    host: false,
+    port: false,
+    user: false,
+    password: false,
+    schema: false
+};
+
 class ConnectionDialog extends React.Component {
 
     constructor(props) {
@@ -35,6 +45,7 @@ class ConnectionDialog extends React.Component {
 
       this.state.database = {type: null, port: 0};
       this.state.tabIndex = 0;
+      this.state.errorObj = errorObj;
     }
   
     state = {};
@@ -50,7 +61,28 @@ class ConnectionDialog extends React.Component {
       this.props.onClose();
     };
   
-    handleOk = () => {     
+    handleOk = () => {  
+        if (this.state.database.type == null) {
+            console.dir(this.snack);
+            this.snack.show("Please select a kind of database.");
+            return;
+        }
+        let err = this.state.errorObj;
+        let valid = true;   
+        let db = this.state.database;
+        Object.keys(err).forEach(function (key) {
+            if (err[key] || db[key] == undefined) {
+                valid = false;
+            }
+        })
+
+        if (!valid) {
+            this.snack.show("The field with start sign CANNOT be empty.");
+            return;
+        }
+        if (this.state.database.id != null) {
+            this.state.database.id = null;
+        }
       this.props.onClose(this.state.database);
     };
 
@@ -65,9 +97,23 @@ class ConnectionDialog extends React.Component {
     };
 
     handleChange = name => event => {
-        let database = {...this.state.database,
-            [name]: event.target.value
+        let err = this.state.errorObj;
+        Object.keys(err).forEach(function (key) {
+            err[key] = false;
+        })
+        this.setState({errorObj: err});
+
+        let val = event.target.value;
+        
+        if (Object.keys(this.state.errorObj).includes(name) && val.trim() == '') {
+                err[name] = true;
+                this.setState({errorObj: err});
         }
+        this.state.errorObj.map
+        let database = {...this.state.database,
+            [name]: val
+        }
+        event.target.error = true;
         this.setState({database: database});
     };
 
@@ -77,7 +123,7 @@ class ConnectionDialog extends React.Component {
         } else {
             this.setState({database: this.props.value});
         }
-    }
+    };
   
     render() {
       const { classes, ...other } = this.props;
@@ -90,13 +136,20 @@ class ConnectionDialog extends React.Component {
           disableEscapeKeyDown
           maxWidth="md"
           aria-labelledby="confirmation-dialog-title"
-          onEnter={this.handleEnter}
+          classes={{paper: classes.popup}}
+        //   onEnter={this.handleEnter}
           {...other}
         >
           <DialogTitle id="confirmation-dialog-title">{title}</DialogTitle>
           <DialogContent>
                   <div className={classes.root}>
                       <Grid container>
+                          <Grid item xs={12}>
+                              <SnackbarContent
+                                  variant="error"
+                                  innerRef={(el) => {this.snack = el}}
+                              />
+                          </Grid>
                           <Grid item xs={12}>
                               <div className={classes.group}>
                                  <div>Groups:</div>
@@ -120,6 +173,7 @@ class ConnectionDialog extends React.Component {
                                           id="host"
                                           label="Host"
                                           required
+                                          error={this.state.errorObj.host}
                                           className={classes.hostTextField}
                                           value={this.state.database.host}
                                           onChange={this.handleChange('host')}
@@ -130,6 +184,7 @@ class ConnectionDialog extends React.Component {
                                           label="Port"
                                           type="number"
                                           required
+                                          error={this.state.errorObj.port}
                                           className={classes.portTextField}
                                           value={this.state.database.port}
                                           onChange={this.handleChange('port')}
@@ -139,6 +194,7 @@ class ConnectionDialog extends React.Component {
                                           id="user"
                                           label="User"
                                           required
+                                          error={this.state.errorObj.user}
                                           className={classes.textField}
                                           value={this.state.database.user}
                                           onChange={this.handleChange('user')}
@@ -148,6 +204,7 @@ class ConnectionDialog extends React.Component {
                                           id="password"
                                           label="Password"
                                           required
+                                          error={this.state.errorObj.password}
                                           type="password"
                                           className={classes.textField}
                                           value={this.state.database.password}
@@ -158,6 +215,7 @@ class ConnectionDialog extends React.Component {
                                           id="database"
                                           label="Database"
                                           required
+                                          error={this.state.errorObj.database}
                                           className={classes.textField}
                                           value={this.state.database.schema}
                                           onChange={this.handleChange('schema')}
@@ -172,7 +230,7 @@ class ConnectionDialog extends React.Component {
                                           margin="dense"
                                       />
                                   </div>
-                                  <Divider light className={classes.divider}/>
+                                  {/* <Divider light className={classes.divider}/> */}
                                   <div>
                                       <Typography variant="subheading">
                                           Connection String Preview
@@ -183,7 +241,7 @@ class ConnectionDialog extends React.Component {
                                   </div>
                               </div>}
                               {this.state.tabIndex === 1 && <div>
-                                  Item Two</div>}
+                                  </div>}
                           </Grid>
                       </Grid>
                   </div>
@@ -192,11 +250,9 @@ class ConnectionDialog extends React.Component {
             <Button onClick={this.handleCancel} color="primary">
               Cancel
             </Button>
-            {db.id === undefined ? 
             <Button onClick={this.handleOk} color="primary">
               Ok
-            </Button> : null
-            }
+            </Button>
           </DialogActions>
         </Dialog>
       );

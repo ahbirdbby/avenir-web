@@ -45,13 +45,13 @@ class EnhancedTableHead extends React.Component {
     return (
       <TableHead>
         <TableRow>
-          <TableCell padding="checkbox">
+          {/* <TableCell padding="checkbox">
             <Checkbox
               indeterminate={numSelected > 0 && numSelected < rowCount}
               checked={numSelected === rowCount && rowCount != 0}
               onChange={onSelectAllClick}
             />
-          </TableCell>
+          </TableCell> */}
           {columns.map(col => {
             return (
               <TableCell
@@ -144,7 +144,7 @@ let EnhancedTableToolbar = props => {
       </div>
       <div className={classes.spacer} />
       <div className={classes.actions}>
-        {numSelected > 0 ? (
+        {/* {numSelected > 0 ? (
           <Tooltip title="Delete">
             <IconButton aria-label="Delete">
               <DeleteIcon />
@@ -156,7 +156,7 @@ let EnhancedTableToolbar = props => {
               <FilterListIcon />
             </IconButton>
           </Tooltip>
-        )}
+        )} */}
       </div>
     </Toolbar>
   );
@@ -247,8 +247,8 @@ class EnhancedTable extends React.Component {
   isSelected = id => this.state.selected.indexOf(id) !== -1;
 
   render() {
-    const { classes, columns } = this.props;
-    const { data, order, orderBy, selected, rowsPerPage, page } = this.state;
+    const { classes, columns, data } = this.props;
+    const { order, orderBy, selected, rowsPerPage, page } = this.state;
     const emptyRows = rowsPerPage - Math.min(rowsPerPage, data.length - page * rowsPerPage);
 
     return (
@@ -274,20 +274,20 @@ class EnhancedTable extends React.Component {
                   return (
                     <TableRow
                       hover
-                      onClick={event => this.handleClick(event, n[ROW_ID])}
+                    //   onClick={event => this.handleClick(event, n[ROW_ID])}
                       role="checkbox"
                       aria-checked={isSelected}
                       tabIndex={-1}
                       key={n[ROW_ID]}
                       selected={isSelected}
                     >
-                      <TableCell padding="checkbox">
+                      {/* <TableCell padding="checkbox">
                         <Checkbox checked={isSelected} />
-                      </TableCell>
-                      {columns.map(c => {
-                        <TableCell numeric={isNumberType(c.dataType)}>
-                          {n[c.name]}
-                        </TableCell>
+                      </TableCell> */}
+                      {columns.map((c,i) => {
+                        return <TableCell key={i} numeric={isNumberType(c.dataType)}>
+                          {n[c.id]}
+                        </TableCell>;
                       })}
                     </TableRow>
                   );

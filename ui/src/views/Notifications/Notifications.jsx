@@ -96,18 +96,18 @@ class Notifications extends React.Component {
               <SnackbarContent message={"This is a plain notification"} />
               <SnackbarContent
                 message={"This is a notification with close button."}
-                close
+                
               />
               <SnackbarContent
                 message={"This is a notification with close button and icon."}
-                close
+                
                 icon={AddAlert}
               />
               <SnackbarContent
                 message={
                   "This is a notification with close button and icon and have many lines. You can see that the icon and the close button are always vertically aligned. This is a beautiful notification. So you don't have to worry about the style."
                 }
-                close
+                
                 icon={AddAlert}
               />
             </GridItem>
@@ -118,36 +118,36 @@ class Notifications extends React.Component {
                 message={
                   'INFO - This is a regular notification made with color="info"'
                 }
-                close
-                color="info"
+                
+                variant="info"
               />
               <SnackbarContent
                 message={
                   'SUCCESS - This is a regular notification made with color="success"'
                 }
-                close
-                color="success"
+                
+                variant="success"
               />
               <SnackbarContent
                 message={
                   'WARNING - This is a regular notification made with color="warning"'
                 }
-                close
-                color="warning"
+                
+                variant="warning"
               />
               <SnackbarContent
                 message={
                   'DANGER - This is a regular notification made with color="danger"'
                 }
-                close
-                color="danger"
+                
+                variant="danger"
               />
               <SnackbarContent
                 message={
                   'PRIMARY - This is a regular notification made with color="primary"'
                 }
-                close
-                color="primary"
+                
+                variant="primary"
               />
             </GridItem>
           </Grid>

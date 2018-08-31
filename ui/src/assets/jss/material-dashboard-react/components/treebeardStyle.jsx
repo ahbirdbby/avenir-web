@@ -48,7 +48,7 @@ export default {
                 base: {
                     display: 'flex',
                     verticalAlign: 'middle',
-                    color: '#9DA5AB',
+                    // color: '#9DA5AB',
                     alignItems: 'center',
                     fontSize: '14px',
                     fontWeight: 300,

@@ -15,7 +15,6 @@ import play.api.libs.json._
 
 import scala.collection.immutable
 import scala.concurrent.Future
-import scala.util.Failure
 
 class Database(val name: String, var tables: Seq[Table], var properties: Map[String, String]) {
   def isRemote: Boolean = properties.getOrElse("dbremote", "false").toBoolean
@@ -194,6 +193,10 @@ class BaseRepository @Inject()(dbApi: DBApi) (implicit ec: DatabaseExecutionCont
     case name ~ dataType ~ sourceType ~ primaryKey => models.Column(name, dataType, sourceType, primaryKey)
   }
 
+  val simpleColumnParser = str("col_name") ~ str("data_type") map {
+    case name ~ dataType => models.Column(name, dataType, "", "")
+  }
+
   val queryParser: RowParser[List[Any]] =
     SqlParser.folder(List[Any]()) { (l, d, meta) =>
       Right(d :: l)
@@ -280,18 +283,18 @@ class BaseRepository @Inject()(dbApi: DBApi) (implicit ec: DatabaseExecutionCont
   def mapDatabase(param: MapDatabaseParam) = Future[Boolean] {
     db.withConnection { implicit connection =>
       var result = false
-      val dbName = param.to
+      val dbName = if (param.to.trim() == "") param.from else param.to
       try {
         val con = getConnection(param)
         val sql = "CREATE DATABASE IF NOT EXISTS " + dbName + " WITH DBPROPERTIES (dbremote='true', url=" + con.url + ", user='" + param.user + "', password='" + param.password + "', type='" + con.databaseType + "', dbname='" + param.from + "')"
         Logger.info("map database sql: " + sql)
         result = SQL(sql).execute()
-        SQL"show remote tables in #$dbName".execute()
+        SQL"show remote tables in `#$dbName`".execute()
       } catch {
         case e:
           Throwable => Logger.error("Failed to map database.", e)
-          SQL"drop database if exists #$dbName cascade".execute()
-          result = false
+          SQL"drop database if exists `#$dbName` cascade".execute()
+          throw e
       }
       result
     }
@@ -299,7 +302,7 @@ class BaseRepository @Inject()(dbApi: DBApi) (implicit ec: DatabaseExecutionCont
 
   def unmapDatabase(name: String) = Future[Boolean] {
     db.withConnection { implicit connection =>
-      SQL"drop database if exists #$name".execute()
+      SQL"drop database if exists `#$name`".execute()
     }
   }(ec)
 
@@ -308,7 +311,7 @@ class BaseRepository @Inject()(dbApi: DBApi) (implicit ec: DatabaseExecutionCont
       val db = param.databaseName
       val from = param.from
       val to = param.to
-      val columns = SQL"describe remote table #$db.#$from".as(columnParser.*)
+      val columns = SQL"describe remote table `#$db`.`#$from`".as(columnParser.*)
       var colString = ""
       columns.foreach(col => colString += (col.name + " " + col.dataType + ","))
       val sql = s"create table $db.$to (" + colString.substring(0, colString.length - 1) + s") tblproperties (dbremote='true', dataObject='$from')"
@@ -318,7 +321,15 @@ class BaseRepository @Inject()(dbApi: DBApi) (implicit ec: DatabaseExecutionCont
 
   def unmapTable(databaseName: String, tableName: String) = Future[Boolean] {
     db.withConnection { implicit connection =>
-      SQL"drop table if exists #$databaseName.#$tableName".execute()
+      SQL"drop table if exists `#$databaseName`.`#$tableName`".execute()
+    }
+  }(ec)
+
+  def getColumns(databaseName: String, tableName: String, remote: Boolean) = Future[Seq[Column]] {
+    db.withConnection { implicit connection =>
+      val remoteStr = if (remote) "remote" else ""
+      val columns = SQL"describe #$remoteStr table `#$databaseName`.`#$tableName`".as(simpleColumnParser.*)
+      columns
     }
   }(ec)
 

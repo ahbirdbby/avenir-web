@@ -72,13 +72,13 @@ class ErrorHandler(environment: Environment,
                                            request: RequestHeader,
                                            exception: UsefulException): Future[Result] = {
     Future.successful {
-      InternalServerError(Json.obj("exception" -> exception.description))
+      InternalServerError(Json.obj("error" -> exception.description))
     }
   }
 
   override protected def onProdServerError(
                                             request: RequestHeader,
                                             exception: UsefulException): Future[Result] = {
-    Future.successful(InternalServerError)
+    Future.successful(InternalServerError(Json.obj("error" -> exception.description)))
   }
 }

@@ -9,6 +9,7 @@ GET     /                           controllers.FrontendController.index()
 # An example route (Prefix all API routes with apiPrefix defined in application.conf)
 GET     /api/summary                controllers.HomeController.appSummary
 GET     /api/databases              controllers.HomeController.getDatabases
+GET     /api/:databaseName/:tableName/columns              controllers.HomeController.getColumns(databaseName: String, tableName: String, remote: Boolean ?= false)
 
 POST     /api/runQuery              controllers.HomeController.runQuery
 POST     /api/mapDatabase              controllers.HomeController.mapDatabase
