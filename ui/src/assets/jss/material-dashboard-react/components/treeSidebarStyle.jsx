@@ -2,7 +2,8 @@ import {
     drawerWidth,
     transition,
     boxShadow,
-    button
+    button,
+    progressColor
 } from "assets/jss/material-dashboard-react.jsx";
 
 const style = theme => ({
@@ -50,7 +51,16 @@ const style = theme => ({
     button: {
         marginRight: 10,
         ...button
-    }
+    },
+    wrapper: {
+        position: 'relative',
+    },
+    progress: {
+        color: progressColor,
+        position: 'absolute',
+        top: '20px',
+        left: '30%',
+      }
 });
 
 export default style;

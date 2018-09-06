@@ -4,7 +4,7 @@ import PropTypes from "prop-types";
 import withStyles from "@material-ui/core/styles/withStyles";
 import Drawer from "@material-ui/core/Drawer";
 import Hidden from "@material-ui/core/Hidden";
-import Divider from '@material-ui/core/Divider';
+// import Divider from '@material-ui/core/Divider';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import Button from '@material-ui/core/Button';
@@ -14,6 +14,7 @@ import AppBar from '@material-ui/core/AppBar';
 import SvgIcon from '@material-ui/core/SvgIcon';
 import Tooltip from '@material-ui/core/Tooltip';
 import DeleteIcon from '@material-ui/icons/Delete';
+import CircularProgress from '@material-ui/core/CircularProgress';
 //self
 import Client from 'Client.js';
 import ConnectionDialog from "views/Dashboard/ConnectionDialog.jsx";
@@ -87,9 +88,9 @@ const dec = {
     Header: ({ style, node }) => {
         return (
             <div style={style.base} >
-                {node.iconType == 'DATABASE' && <DatabaseIcon />}
-                {node.iconType == 'TABLE' && <TableIcon />}
-                {node.iconType == 'COLUMN' && <ColumnIcon />}
+                {node.iconType === 'DATABASE' && <DatabaseIcon />}
+                {node.iconType === 'TABLE' && <TableIcon />}
+                {node.iconType === 'COLUMN' && <ColumnIcon />}
                 {!node.iconType && <TablesIcon />}
                 <div>
                     <span>{node.name}</span>
@@ -105,6 +106,7 @@ class TreeSidebar extends React.Component {
         connections: [],
         databases: [],
         remoteDatabases: [],
+        loading: false
     };
 
     async componentDidMount() {
@@ -122,32 +124,35 @@ class TreeSidebar extends React.Component {
     closeConnectionDialog = (connection) => {
         let connections = this.state.connections;
         if (connection) {
-            Client.mapDatabase({ ...connection, databaseType: connection.type.value, from: connection.schema, to: connection.toSchema == undefined ? '' : connection.toSchema, port: parseInt(connection.port) }, result => {
+            Client.mapDatabase({ ...connection, databaseType: connection.type.value, from: connection.schema, to: connection.toSchema === undefined ? '' : connection.toSchema, port: parseInt(connection.port, 10) }, result => {
                 window.notification.success("Success map database.");
                 this.refreshDatabaseTree();
             })
-        } else {
-            window.notification.error("The connection info is empty.");
         }
 
         this.setState(prev => ({ ...prev, popup: false, connections: connections }));
     };
 
     refreshDatabaseTree = () => {
+        this.setState({loading: true});
+
         Client.getDatabases(databases => {
             let locals = [], remotes = [];
             let remoteDbs = databases.remoteDatabases, localDbs = databases.localDatabases;
             localDbs.map(db => {
                 build(db, locals);
+                return db;
             });
             this.setState({ databases: locals });
             remoteDbs.map(db => {
                 build(db, remotes);
+                return db;
             });
             this.setState({ remoteDatabases: remotes });
+            this.setState({loading: false});
 
             function build(db, arr) {
-                db.tables.map(tbl => { tbl.iconType = 'TABLE', tbl.parent = db, tbl.children = [{name: 'columns', iconType: 'COLUMNS', tableNode: tbl, children: []}] })
+                db.tables.map(tbl => { tbl.iconType = 'TABLE'; tbl.parent = db; tbl.children = [{name: 'columns', iconType: 'COLUMNS', tableNode: tbl, children: []}]; return tbl; })
                 let tables = { name: 'tables', children: db.tables }
                 arr.push({ name: db.name, iconType: 'DATABASE', children: [tables] });
             }
@@ -156,7 +161,9 @@ class TreeSidebar extends React.Component {
 
     onToggle = (node, toggled) => {
         if (this.state.cursor) { 
-            this.state.cursor.active = false; 
+            const cur = this.state.cursor;
+            cur.active = false;
+            this.setState({cursor: cur});
         }
         node.active = true;
         
@@ -168,7 +175,11 @@ class TreeSidebar extends React.Component {
     }
 
     onRemoteToggle = (node, toggled) => {
-        if (this.state.remoteCursor) { this.state.remoteCursor.active = false; }
+        if (this.state.remoteCursor) { 
+            const cur = this.state.remoteCursor;
+            cur.active = false;
+            this.setState({remoteCursor: cur});
+        }
         node.active = true;
         if (node.children) { node.toggled = toggled; }
         this.loadColumns(node, true);
@@ -176,7 +187,7 @@ class TreeSidebar extends React.Component {
     };
 
     loadColumns = (node, remote) => {
-        if (node.iconType == "COLUMNS" && !node.columnsLoaded) {
+        if (node.iconType === "COLUMNS" && !node.columnsLoaded) {
             node.loading = true;
             let tableNode = node.tableNode, dbNode = tableNode.parent;
             let state = this.state;
@@ -185,6 +196,7 @@ class TreeSidebar extends React.Component {
                     col.iconType = 'COLUMN';
                     col.parent = tableNode;
                     node.children.push(col);
+                    return col;
                 });
 
                 node.loading = false;
@@ -196,7 +208,7 @@ class TreeSidebar extends React.Component {
 
     mapTable = () => {
         let node = this.state.remoteCursor;
-        if (node && node.iconType == "TABLE") {
+        if (node && node.iconType === "TABLE") {
           let data = {from: node.name,
             to: node.name,
             databaseName: node.parent.name
@@ -212,9 +224,9 @@ class TreeSidebar extends React.Component {
     
     unmapTable = () => {
         let node = this.state.cursor;
-        if (node && node.iconType == "TABLE") {
+        if (node && node.iconType === "TABLE") {
             let db = node.parent.name;
-            if (db == 'default') {
+            if (db === 'default') {
                 window.notification.warning("Cannot drop table in 'default' database.");
                 return;
             }
@@ -229,9 +241,9 @@ class TreeSidebar extends React.Component {
 
     unmapDatabase = () => {
         let node = this.state.cursor;
-        if (node && node.iconType == "DATABASE") {
+        if (node && node.iconType === "DATABASE") {
             let db = node.name;
-            if (db == 'default') {
+            if (db === 'default') {
                 window.notification.warning("Cannot drop 'default' database.");
                 return;
             }
@@ -247,7 +259,7 @@ class TreeSidebar extends React.Component {
 
     render() {
         const { classes} = this.props;
-        const {tab} = this.state;
+        const {tab, loading} = this.state;
 
         const content = (
             <div>
@@ -275,23 +287,29 @@ class TreeSidebar extends React.Component {
                         <div className={classes.tabToolbar}><Button variant="outlined" color="primary" size="small" className={classes.button} onClick={this.unmapTable}>
                             Unmap Table
                             </Button></div>
-                        <Treebeard
-                            data={this.state.databases}
-                            onToggle={this.onToggle}
-                            decorators={dec}
-                            style={TreebeardStyle}
-                        />
+                        <div className={classes.wrapper}>
+                            <Treebeard
+                                data={this.state.databases}
+                                onToggle={this.onToggle}
+                                decorators={dec}
+                                style={TreebeardStyle}
+                            />
+                            {loading && <CircularProgress size={48} className={classes.progress} />}
+                        </div>
                     </TabContainer>}
                     {tab === 1 && <TabContainer>
                         <div className={classes.tabToolbar}><Button variant="outlined" color="primary" size="small" className={classes.button} onClick={this.mapTable}>
                             Map Table
                         </Button></div>
-                        <Treebeard
-                            data={this.state.remoteDatabases}
-                            onToggle={this.onRemoteToggle}
-                            decorators={dec}
-                            style={TreebeardStyle}
-                        />
+                        <div className={classes.wrapper}>
+                            <Treebeard
+                                data={this.state.remoteDatabases}
+                                onToggle={this.onRemoteToggle}
+                                decorators={dec}
+                                style={TreebeardStyle}
+                            />
+                            {loading && <CircularProgress size={48} className={classes.progress} />}
+                        </div>
                     </TabContainer>}
                 </div>
             </div>

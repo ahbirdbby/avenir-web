@@ -7,15 +7,15 @@ function baseGet(url, cb) {
   return base(url, "", "GET", cb);
 }
 
-function basePost(url, data, cb) {
-  return base(url, data, "POST", cb);
+function basePost(url, data, cb, context) {
+  return base(url, data, "POST", cb, context);
 }
 
 function baseDelete(url, cb) {
   return base(url, "", "DELETE", cb);
 }
 
-function base(url, data, method, cb) {
+function base(url, data, method, cb, context) {
   let content = {
     cache: 'no-cache',
     headers: {
@@ -26,7 +26,7 @@ function base(url, data, method, cb) {
     method: method
   };
 
-  if (method != 'GET') {
+  if (method !== 'GET') {
     content.body = JSON.stringify(data);
   }
 
@@ -38,10 +38,10 @@ function base(url, data, method, cb) {
       let jsonType = response.headers.get("content-type").indexOf("application/json") !== -1
       if (response && jsonType) {
         response.json().then(json => {
-          if (json != undefined) {
-            if (typeof json.error == 'string') {
+          if (json !== undefined) {
+            if (typeof json.error === 'string') {
               msg = json.error;
-            } else if (typeof json.error == 'object') {
+            } else if (typeof json.error === 'object') {
               msg = JSON.stringify(json.error);
             }
             let notification = window.notification;
@@ -53,6 +53,9 @@ function base(url, data, method, cb) {
         notification.error(msg);
       }
       
+      if(context && context.throwError){
+        throw error;
+      }
     })
 }
 
@@ -92,8 +95,8 @@ function unmapTable(databaseName, tableName, cb) {
   return baseDelete('/api/databases/' + databaseName + "/tables/" + tableName, cb);
 }
 
-function runQuery(sql, cb) {
-  return basePost('/api/runQuery', {"sql": sql}, cb);
+function runQuery(sql, cb, context) {
+  return basePost('/api/runQuery', {"sql": sql}, cb, context);
 }
 
 function getColumns(databaseName, tableName, remote, cb) {

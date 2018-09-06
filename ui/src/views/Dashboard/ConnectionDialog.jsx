@@ -12,7 +12,7 @@ import TextField from '@material-ui/core/TextField';
 import Select from 'react-select';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
-import Divider from '@material-ui/core/Divider';
+// import Divider from '@material-ui/core/Divider';
 import Typography from '@material-ui/core/Typography';
 // core components
 import SnackbarContent from "components/Snackbar/SnackbarContent.jsx";
@@ -63,7 +63,6 @@ class ConnectionDialog extends React.Component {
   
     handleOk = () => {  
         if (this.state.database.type == null) {
-            console.dir(this.snack);
             this.snack.show("Please select a kind of database.");
             return;
         }
@@ -71,7 +70,7 @@ class ConnectionDialog extends React.Component {
         let valid = true;   
         let db = this.state.database;
         Object.keys(err).forEach(function (key) {
-            if (err[key] || db[key] == undefined) {
+            if (err[key] || db[key] === undefined) {
                 valid = false;
             }
         })
@@ -81,7 +80,9 @@ class ConnectionDialog extends React.Component {
             return;
         }
         if (this.state.database.id != null) {
-            this.state.database.id = null;
+            const db = this.state.database;
+            db.id = null;
+            this.setState({database: db});
         }
       this.props.onClose(this.state.database);
     };
@@ -105,11 +106,10 @@ class ConnectionDialog extends React.Component {
 
         let val = event.target.value;
         
-        if (Object.keys(this.state.errorObj).includes(name) && val.trim() == '') {
+        if (Object.keys(this.state.errorObj).includes(name) && val.trim() === '') {
                 err[name] = true;
                 this.setState({errorObj: err});
         }
-        this.state.errorObj.map
         let database = {...this.state.database,
             [name]: val
         }

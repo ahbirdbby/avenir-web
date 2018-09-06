@@ -1,6 +1,8 @@
-import { successColor,  
+import {
   drawerWidth,
-  transition} from "assets/jss/material-dashboard-react.jsx";
+  transition,
+  progressColor
+} from "assets/jss/material-dashboard-react.jsx";
 
 const dashboardStyle = theme => ({
   mainPanel: {
@@ -21,6 +23,22 @@ const dashboardStyle = theme => ({
   },
   button: {
     margin: theme.spacing.unit
+  },
+  wrapper: {
+    position: 'relative',
+  },
+  fabProgress: {
+    color: progressColor,
+    position: 'absolute',
+    top: '40%',
+    left: '45%',
+    zIndex: 1,
+  },
+  buttonProgress: {
+    color: progressColor,
+    position: 'absolute',
+    top: '14px',
+    marginLeft: -80,
   }
 });
 

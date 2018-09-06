@@ -6,6 +6,7 @@ import "perfect-scrollbar/css/perfect-scrollbar.css";
 import withStyles from "@material-ui/core/styles/withStyles";
 import IconButton from "@material-ui/core/IconButton";
 import Hidden from "@material-ui/core/Hidden";
+import CircularProgress from '@material-ui/core/CircularProgress';
 // @material-ui/icons
 import Menu from "@material-ui/icons/Menu";
 import Button from '@material-ui/core/Button';
@@ -44,12 +45,13 @@ class Dashboard extends React.Component {
     mobileOpen: false,
     sql: '   select * from xmysql.item',
     columns:[],
-    data: []
+    data: [],
+    querying: false
   };
 
   componentDidMount() {
     if (navigator.platform.indexOf("Win") > -1) {
-      const ps = new PerfectScrollbar(this.refs.mainPanel);
+      new PerfectScrollbar(this.refs.mainPanel);
     }
   }
   componentDidUpdate(e) {
@@ -70,22 +72,29 @@ class Dashboard extends React.Component {
   }
 
   runQuery = () => {
+    this.setState({querying: true});
+
     Client.runQuery(this.state.sql, result => {
-      let cols = result.columns.map(c => { return {id: c.name, dataType: c.dataType, label: c.name}});
+      let cols = result.columns.map(c => { return { id: c.name, dataType: c.dataType, label: c.name } });
       let data = result.rows.map((r, i) => {
-        let newR = {'ROW_#_ID': ++i};
+        let newR = { 'ROW_#_ID': ++i };
         result.columns.map((c, index) => {
           newR[c.name] = r[index];
+          return c;
         })
         return newR;
       });
 
-      this.setState({columns: cols, data: data});
+      this.setState({ columns: cols, data: data, querying: false });
+    }, { throwError: true }).catch(err => {
+      this.setState({ querying: false });
     });
   }
 
   render() {
     const { classes, ...rest } = this.props;
+    const {querying} = this.state;
+
     return (
       <ErrorBoundary>        
         <TreeSidebar
@@ -101,9 +110,12 @@ class Dashboard extends React.Component {
           />
           <div className={classes.content}>
               <div style={{paddingBottom: 15}}>
-                <Button aria-label="Run Query" color="primary" variant="contained" className={classes.button} onClick={this.runQuery}>
+              <div className={classes.wrapper}>
+                <Button aria-label="Run Query" color="primary" variant="contained" className={classes.button} onClick={this.runQuery} disabled={querying}>
                   Run Query
                 </Button>
+                {querying && <CircularProgress size={24} className={classes.buttonProgress} />}
+                </div>
                 <Hidden mdUp>
                   <IconButton
                     className={classes.button}
@@ -117,8 +129,10 @@ class Dashboard extends React.Component {
                 </Hidden>
               </div>
               <Codemirror value={this.state.sql} onChange={this.updateSql} options={options} />
-
+              <div className={classes.wrapper}>
               <ListTable columns={this.state.columns} data={this.state.data} />
+              {querying && <CircularProgress size={68} className={classes.fabProgress} />}
+              </div>
           </div>
         </div>
       </ErrorBoundary>

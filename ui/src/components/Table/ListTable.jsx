@@ -12,11 +12,11 @@ import TableSortLabel from '@material-ui/core/TableSortLabel';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import Paper from '@material-ui/core/Paper';
-import Checkbox from '@material-ui/core/Checkbox';
-import IconButton from '@material-ui/core/IconButton';
+// import Checkbox from '@material-ui/core/Checkbox';
+// import IconButton from '@material-ui/core/IconButton';
 import Tooltip from '@material-ui/core/Tooltip';
-import DeleteIcon from '@material-ui/icons/Delete';
-import FilterListIcon from '@material-ui/icons/FilterList';
+// import DeleteIcon from '@material-ui/icons/Delete';
+// import FilterListIcon from '@material-ui/icons/FilterList';
 import { lighten } from '@material-ui/core/styles/colorManipulator';
 
 
@@ -25,7 +25,7 @@ function getSorting(order, orderBy) {
 }
 
 function isNumberType(colType) {
-    if (colType == 'bigint' || colType == 'decimal' || colType == 'short' || colType == 'integer' || colType == 'long' || colType == 'float' || colType == 'double') {
+    if (colType === 'bigint' || colType === 'decimal' || colType === 'short' || colType === 'integer' || colType === 'long' || colType === 'float' || colType === 'double') {
         return true;
     } else {
         return false;
@@ -40,7 +40,8 @@ class EnhancedTableHead extends React.Component {
   };
 
   render() {
-    const { onSelectAllClick, order, orderBy, numSelected, rowCount, columns } = this.props;
+
+    const {order, orderBy, columns } = this.props;
 
     return (
       <TableHead>

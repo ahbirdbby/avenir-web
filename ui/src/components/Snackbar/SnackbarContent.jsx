@@ -115,7 +115,7 @@ class SnackbarContent extends React.Component {
             <CloseIcon className={classes.icon} />
           </IconButton>,
         ]}
-        {...other}
+        // {...other}
       />
     );
   }
