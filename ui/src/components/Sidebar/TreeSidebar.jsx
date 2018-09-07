@@ -106,7 +106,8 @@ class TreeSidebar extends React.Component {
         connections: [],
         databases: [],
         remoteDatabases: [],
-        loading: false
+        loading: false,
+        popup: false
     };
 
     async componentDidMount() {
@@ -149,6 +150,7 @@ class TreeSidebar extends React.Component {
                 return db;
             });
             this.setState({ remoteDatabases: remotes });
+            this.props.setRemoteDatabases(remotes);
             this.setState({loading: false});
 
             function build(db, arr) {

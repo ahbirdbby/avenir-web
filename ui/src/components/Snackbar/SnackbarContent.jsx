@@ -90,7 +90,7 @@ class SnackbarContent extends React.Component {
   }
 
   render() {
-    const { classes, className, variant, ...other } = this.props;
+    const { classes, className} = this.props;
     let realVariant = this.state.variant;
     const Icon = variantIcon[realVariant];
 

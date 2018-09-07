@@ -19,9 +19,14 @@ import Tooltip from '@material-ui/core/Tooltip';
 // import FilterListIcon from '@material-ui/icons/FilterList';
 import { lighten } from '@material-ui/core/styles/colorManipulator';
 
+const ROW_ID = 'ROW_#_ID';
 
 function getSorting(order, orderBy) {
-  return order === 'desc' ? (a, b) => b[orderBy] - a[orderBy] : (a, b) => a[orderBy] - b[orderBy];
+  if (orderBy === undefined || orderBy.trim() === '') {
+    return (a, b) => a[ROW_ID] - b[ROW_ID];
+  } else {
+    return order === 'desc' ? (a, b) => b[orderBy] - a[orderBy] : (a, b) => a[orderBy] - b[orderBy];
+  }
 }
 
 function isNumberType(colType) {
@@ -31,8 +36,6 @@ function isNumberType(colType) {
         return false;
     }
 }
-
-const ROW_ID = 'ROW_#_ID';
 
 class EnhancedTableHead extends React.Component {
   createSortHandler = property => event => {
@@ -88,7 +91,7 @@ EnhancedTableHead.propTypes = {
   onRequestSort: PropTypes.func.isRequired,
   onSelectAllClick: PropTypes.func.isRequired,
   order: PropTypes.string.isRequired,
-  orderBy: PropTypes.string.isRequired,
+  orderBy: PropTypes.string,
   rowCount: PropTypes.number.isRequired,
   columns: PropTypes.arrayOf(PropTypes.shape({
     id: PropTypes.string.isRequired,

@@ -39,6 +39,14 @@ const dashboardStyle = theme => ({
     position: 'absolute',
     top: '14px',
     marginLeft: -80,
+  },
+  select: {
+    display: 'none',
+    width: 280,
+    zIndex: 10
+  },
+  showSelect: {
+    display: 'inline-block'
   }
 });
 
